@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Product extends Model
 {
@@ -22,5 +23,21 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    // Магазины, где товар есть в ассортименте, с остатком в pivot->quantity
+    public function stores(): BelongsToMany
+    {
+        return $this->belongsToMany(Store::class, 'store_products')
+            ->withPivot('quantity')
+            ->withTimestamps();
+    }
+
+    // Характеристики товара со значениями в pivot
+    public function characteristics(): BelongsToMany
+    {
+        return $this->belongsToMany(Characteristic::class, 'product_characteristic_values')
+            ->withPivot(['value_number', 'value_text'])
+            ->withTimestamps();
     }
 }

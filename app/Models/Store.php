@@ -3,19 +3,29 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Store extends Model
 {
-    protected $fillable = ['name', 'city', 'address', 'director_id', 'is_active'];
+    protected $fillable = ['name', 'city', 'address', 'is_active'];
 
     protected function casts(): array
     {
         return ['is_active' => 'boolean'];
     }
 
-    public function director(): BelongsTo
+    // Сотрудники магазина (директор и менеджеры)
+    public function staff(): HasMany
     {
-        return $this->belongsTo(User::class, 'director_id');
+        return $this->hasMany(User::class);
+    }
+
+    // Товары в ассортименте магазина с остатком в pivot->quantity
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'store_products')
+            ->withPivot('quantity')
+            ->withTimestamps();
     }
 }
